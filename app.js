@@ -1,10 +1,12 @@
 const express = require('express');
 const fetch = require('node-fetch');
+const config = require('./config.js');
 const app = express();
 
 const port = 3000;
 
 const crimes = [];
+const key = config.KEY;
 
 app.get('/', (req, res) => {
   fetch('https://data.sccgov.org/resource/n9u6-aijz.json')
@@ -19,7 +21,7 @@ app.get('/', (req, res) => {
       crime = json[0];
 
       fetch(`https://maps.googleapis.com/maps/api/geocode/json?address=${address},
-        +${city},+CA&key=AIzaSyA6zb2Dv26xLpOe7FJSDX8BayoGAnfTfT0`)
+        +${city},+CA&key=${key}`)
         .then((data) => data.json())
         .then((coord) => {
           location.lng = coord.results[0].geometry.location.lng;
