@@ -15,8 +15,6 @@ module.exports = config;
 ```
 replace [API KEY] with a valid api key
 
-module.exports = config;
-
 ## Run locally
 
 ```node
