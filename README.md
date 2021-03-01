@@ -10,6 +10,8 @@ config.js will contain the following code:
 const config = {
   KEY: [API KEY],
 };
+
+module.exports = config;
 ```
 replace [API KEY] with a valid api key
 
