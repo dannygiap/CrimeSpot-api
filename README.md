@@ -13,7 +13,7 @@ const config = {
 
 module.exports = config;
 ```
-replace [API KEY] with a valid api key
+Replace [API KEY] with a valid api key
 
 ## Run locally
 
