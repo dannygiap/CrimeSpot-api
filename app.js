@@ -21,7 +21,10 @@ var firebaseConfig = {
 // Initialize Firebase
 firebase.initializeApp(firebaseConfig);
 
-const db = firebase.firestore();
+let db = firebase.firestore();
+
+//using Firebase Emulator for development and testing purposes.
+db.useEmulator('localhost', 9090);
 
 const testCrime = {
   case_number: 'S210820046',
