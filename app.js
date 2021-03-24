@@ -24,7 +24,7 @@ firebase.initializeApp(firebaseConfig);
 let db = firebase.firestore();
 
 //using Firebase Emulator for development and testing purposes.
-db.useEmulator('localhost', 9090);
+// db.useEmulator('localhost', 9090);
 
 const testCrime = {
   case_number: 'S210820046',
