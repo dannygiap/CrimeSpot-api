@@ -2,7 +2,6 @@ const express = require('express');
 const fetch = require('node-fetch');
 const config = require('./config.js');
 const firebase = require('firebase/app');
-const admin = require('firebase-admin');
 require('firebase/firestore');
 
 const app = express();
@@ -20,12 +19,9 @@ var firebaseConfig = {
 };
 // Initialize Firebase
 firebase.initializeApp(firebaseConfig);
-
 let db = firebase.firestore();
 
-//using Firebase Emulator for development and testing purposes.
-// db.useEmulator('localhost', 9090);
-
+let crimes = [];
 const testCrime = {
   case_number: 'S210820046',
   incident_datetime: '2021-03-23T05:26:02.000',
@@ -66,48 +62,48 @@ fetch(`https://maps.googleapis.com/maps/api/geocode/json?address=${testCrime.add
       .catch((err) => console.log(err));
   });
 
-// app.get('/', (req, res) => {
-//   fetch('https://data.sccgov.org/resource/n9u6-aijz.json')
-//     .then((data) => data.json())
-//     .then((json) => {
-//       let address = json[0].address_1;
-//       let city = json[0].city;
-//       let crime = {};
-//       let location = {};
+app.get('/crimes', (req, res) => {
+  fetch('https://data.sccgov.org/resource/n9u6-aijz.json')
+    .then((data) => data.json())
+    .then((json) => {
+      let address = json[0].address_1;
+      let city = json[0].city;
+      let crime = {};
+      let location = {};
 
-//       crime = json[0];
-//       var docRef = db.collection('crimes').doc(`${json[0].case_number}`);
-//       docRef
-//         .set({
-//           time: json[0].incident_datetime,
-//           description: json[0].incident_description,
-//           type: json[0].incident_type_primary,
-//         })
-//         .then(() => console.log('crime data saved'))
-//         .catch((err) => console.log(err));
+      crime = json[0];
+      var docRef = db.collection('crimes').doc(`${json[0].case_number}`);
+      docRef
+        .set({
+          time: json[0].incident_datetime,
+          description: json[0].incident_description,
+          type: json[0].incident_type_primary,
+        })
+        .then(() => console.log('crime data saved'))
+        .catch((err) => console.log(err));
 
-//       fetch(`https://maps.googleapis.com/maps/api/geocode/json?address=${address},
-//         +${city},+CA&key=${key}`)
-//         .then((data) => data.json())
-//         .then((coord) => {
-//           location.lng = coord.results[0].geometry.location.lng;
-//           location.lat = coord.results[0].geometry.location.lat;
-//           crime.location = location;
-//           crimes.push(crime);
+      fetch(`https://maps.googleapis.com/maps/api/geocode/json?address=${address},
+        +${city},+CA&key=${key}`)
+        .then((data) => data.json())
+        .then((coord) => {
+          location.lng = coord.results[0].geometry.location.lng;
+          location.lat = coord.results[0].geometry.location.lat;
+          crime.location = location;
+          crimes.push(crime);
 
-//           docRef
-//             .update({
-//               lng: coord.results[0].geometry.location.lng,
-//               lat: coord.results[0].geometry.location.lat,
-//             })
-//             .then(() => console.log('coorinates saved'))
-//             .catch((err) => console.log(err));
+          docRef
+            .update({
+              lng: coord.results[0].geometry.location.lng,
+              lat: coord.results[0].geometry.location.lat,
+            })
+            .then(() => console.log('coorinates saved'))
+            .catch((err) => console.log(err));
 
-//           res.json(crimes);
-//         });
-//     });
-// });
+          res.json(crimes);
+        });
+    });
+});
 
-// app.listen(port, () => {
-//   console.log(`Example app listening at http://localhost:${port}`);
-// });
+app.listen(port, () => {
+  console.log(`Example app listening at http://localhost:${port}`);
+});

@@ -4,7 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "mocha --exit"
   },
   "repository": {
     "type": "git",
@@ -21,5 +21,11 @@
     "firebase": "^8.3.1",
     "firebase-admin": "^9.5.0",
     "node-fetch": "^2.6.1"
+  },
+  "devDependencies": {
+    "@firebase/rules-unit-testing": "^1.2.9",
+    "@firebase/testing": "^0.20.11",
+    "firebase-functions-test": "^0.2.3",
+    "mocha": "^8.3.2"
   }
 }
