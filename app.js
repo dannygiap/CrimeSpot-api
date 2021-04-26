@@ -2,6 +2,7 @@ const express = require('express');
 const fetch = require('node-fetch');
 const config = require('./config.js');
 const firebase = require('firebase/app');
+const geofire = require('geofire-common');
 require('firebase/firestore');
 
 const app = express();
@@ -38,9 +39,11 @@ const testCrime = {
 var docRef = db.collection('crimes').doc(`${testCrime.case_number}`);
 docRef
   .set({
-    time: testCrime.incident_datetime,
-    description: testCrime.incident_description,
-    type: testCrime.incident_type_primary,
+    datetime: testCrime.incident_datetime,
+    primary_type: testCrime.incident_type_primary,
+    parent_type: testCrime.parent_incident_type,
+    city: testCrime.city,
+    state: testCrime.state,
   })
   .then(() => console.log('crime data saved'))
   .catch((err) => console.log(err));
@@ -53,10 +56,15 @@ fetch(`https://maps.googleapis.com/maps/api/geocode/json?address=${testCrime.add
   .then((coord) => {
     location.lng = coord.results[0].geometry.location.lng;
     location.lat = coord.results[0].geometry.location.lat;
+    let hash = geofire.geohashForLocation([location.lat, location.lng]);
 
     docRef
       .update({
-        location: location,
+        location: {
+          geohash: hash,
+          geopoint: new firebase.firestore.GeoPoint(location.lat, location.lng),
+        },
+        coord: { lat: location.lat, lng: location.lng },
       })
       .then(() => console.log('coorinates saved'))
       .catch((err) => console.log(err));

@@ -3,6 +3,7 @@ const firebase = require('@firebase/rules-unit-testing');
 
 const MY_PROJECT_ID = 'crime-spot-305622';
 const PROJECT = { projectId: MY_PROJECT_ID };
+
 describe('CrimeSpot app', () => {
   it('understand basic math', async () => {
     assert.equal(2 + 2, 4);
