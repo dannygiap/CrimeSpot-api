@@ -17,10 +17,10 @@
   },
   "homepage": "https://github.com/dannygiap/CrimeSpot-api#readme",
   "dependencies": {
-    "express": "^4.17.1",
     "firebase": "^8.3.1",
     "firebase-admin": "^9.5.0",
     "geofire-common": "^5.2.0",
+    "node-cron": "^3.0.0",
     "node-fetch": "^2.6.1"
   },
   "devDependencies": {
