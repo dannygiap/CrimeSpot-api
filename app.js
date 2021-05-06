@@ -1,31 +1,26 @@
 const config = require('./config/config.js');
-const firebase = require('firebase/app');
+const admin = require('firebase-admin');
 const cron = require('node-cron');
 const fs = require('fs');
 const fetchCrimes = require('./src/get-crime.js');
+const serviceAccount = require('./config/serviceAccount.json');
 require('firebase/firestore');
 
 const key = config.KEY;
 
-var firebaseConfig = {
-  apiKey: key,
-  authDomain: 'crime-spot-305622.firebaseapp.com',
-  projectId: 'crime-spot-305622',
-  storageBucket: 'crime-spot-305622.appspot.com',
-  messagingSenderId: '546726224547',
-  appId: '1:546726224547:web:ad753b557b408d4f375516',
-  measurementId: 'G-L638M6VMSV',
-};
-// Initialize Firebase
-firebase.initializeApp(firebaseConfig);
+// Initialize Firebase as admin
+admin.initializeApp({
+  credential: admin.credential.cert(serviceAccount),
+  databaseURL: 'https://crime-spot-305622.firebaseio.com',
+});
 
-let db = firebase.firestore();
+let db = admin.firestore();
 
 if (process.env.NODE_ENV === 'development') {
   db.useEmulator('localhost', 8080);
 }
 
-fetchCrimes(db, key, firebase);
+fetchCrimes(db, key, admin);
 // cron.schedule('46 17 5 * *', () => {
 //   let log = `Fetched Crime Data on ${new Date().toUTCString()}\n`;
 //   fetchCrimes(db, key, firebase);
