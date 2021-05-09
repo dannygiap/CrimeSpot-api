@@ -2,13 +2,66 @@ const fetch = require('node-fetch');
 const sleep = require('./sleep.js');
 const geofire = require('geofire-common');
 
-function fetchCrimes(db, key, firebase) {
-  console.log(`Started Fetching Crimes at ${new Date().toTimeString()}`);
+let dontAdd = [
+  'ABANDONED 911 CALL',
+  'ABANDONED OR FOUND BICYCLE',
+  'ABANDONED VEHICLE',
+  'ABANDONED VEHICLE, BLOCKING DRIVEWAY',
+  'ALARM',
+  'ALARM, AUDIBLE',
+  'ALARM, SILENT',
+  'BAD CHECKS (PHONY CHECKS)',
+  'BAD CHECKS (WORTHLESS CHECKS)',
+  'BEAT INFORMATION',
+  'COUNTY ORDINANCE',
+  'DESK ASSIGNMENT',
+  'EVENT FOR INFO ONLY',
+  'FOLLOW UP',
+  'MEET THE CITIZEN',
+  'PHONE UR OFFICE, OR:',
+  'PICK-UP',
+  'RECOVERED VEHICLE',
+  'SPECIAL ASSIGNMENT',
+  'TAKE A REPORT',
+  'UNKN TYPE 7 DIGIT EMERGENCY CALL',
+  'UNKNOWN TYPE 911 CALL',
+  'VEHICLE STOP',
+  'WIRELESS ABANDONED 911 CALL',
+  'ABANDONED 7 DIGIT EMERGENCY CALL',
+  'ATTEMPT TO CONTACT',
+  'PEDESTRIAN STOP',
+  'DOCUMENT SERVICE',
+  'PATROL CHECK',
+  'WELFARE CHECK',
+  'SERVICE OR AID REQUEST',
+  'PUBLIC SAFETY ASSISTANCE',
+  'FOOT PATROL',
+];
 
-  fetch('https://data.sccgov.org/resource/n9u6-aijz.json')
+function fetchCrimes(db, key, firebase) {
+  let from = "'2020-01-01T00:00:00'";
+  let to = "'2020-12-31T23:00:00'";
+  fetch(
+    `https://data.sccgov.org/resource/n9u6-aijz.json?$where=incident_datetime between ${from} and ${to}&$limit=10000`,
+    {
+      method: 'GET',
+      headers: {
+        'X-App-Token': 'gzGhsK5HDvHDwYtVdgc3KFI25',
+      },
+    }
+  )
     .then((data) => data.json())
     .then(async (crimes) => {
-      for (let i = 0; i < 1000; i++) {
+      console.log(`retrieved ${crimes.length} crimes`);
+      for (let i = 0; i < crimes.length; i++) {
+        //check for unneccessary crimes
+        if (
+          dontAdd.includes(crimes[i].incident_type_primary) ||
+          !crimes[i].incident_type_primary
+        ) {
+          console.log('Bad Data');
+          continue;
+        }
         let crimeRef = db.collection('crimes').doc(`${crimes[i].case_number}`);
 
         //check for existing document in firestore
@@ -18,7 +71,10 @@ function fetchCrimes(db, key, firebase) {
             exists = true;
           }
         });
-        if (exists) continue;
+        if (exists) {
+          console.log('Crime Already Exists');
+          continue;
+        }
 
         let address = crimes[i].address_1;
         let city = crimes[i].city;
